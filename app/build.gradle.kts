@@ -1,9 +1,12 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.dagger.hilt.android)
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.ksp)
+	alias(libs.plugins.ktlint)
 }
 
 android {
@@ -26,9 +29,12 @@ android {
 		release {
 			optimization {
 				enable = true
-				packageScope = setOf(
-					"androidx.**", "kotlin.**", "kotlinx.**"
-									)
+				packageScope =
+					setOf(
+						"androidx.**",
+						"kotlin.**",
+						"kotlinx.**",
+					)
 			}
 		}
 	}
@@ -39,8 +45,9 @@ android {
 	buildFeatures {
 		compose = true
 	}
-}
 
+	tasks.getByPath("preBuild").dependsOn("ktlintFormat")
+}
 
 dependencies {
 
@@ -58,6 +65,7 @@ dependencies {
 	implementation(libs.ktor.serialization.kotlinx.json)
 	implementation(platform(libs.androidx.compose.bom))
 	implementation(libs.splashscreen)
+	implementation(libs.timber)
 
 	implementation(libs.hilt)
 	implementation(libs.hilt.navigation.compose)
@@ -82,4 +90,13 @@ dependencies {
 
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
 	debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+ktlint {
+	android = true
+	ignoreFailures = false
+	reporters {
+		reporter(ReporterType.CHECKSTYLE)
+		reporter(ReporterType.HTML)
+	}
 }
