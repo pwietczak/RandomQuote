@@ -7,11 +7,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.glance.appwidget.updateAll
 import dagger.hilt.android.AndroidEntryPoint
 import eu.pw.randomquote.presentation.randomquote.RandomQuoteScreen
 import eu.pw.randomquote.ui.theme.RandomQuoteTheme
+import eu.pw.randomquote.widget.presentation.QuoteWidget
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -22,6 +25,9 @@ class MainActivity : ComponentActivity() {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContent {
+			LaunchedEffect(Unit) {
+				QuoteWidget().updateAll(this@MainActivity)
+			}
 			RandomQuoteTheme {
 				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 					RandomQuoteScreen(modifier = Modifier.padding(innerPadding))

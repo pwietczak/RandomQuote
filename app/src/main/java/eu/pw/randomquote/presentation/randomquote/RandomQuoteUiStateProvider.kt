@@ -1,19 +1,18 @@
 package eu.pw.randomquote.presentation.randomquote
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import eu.pw.randomquote.R
 import eu.pw.randomquote.presentation.randomquote.model.QuoteUi
 
 class RandomQuoteUiStateProvider : PreviewParameterProvider<RandomQuoteUiState> {
 	override val values: Sequence<RandomQuoteUiState> =
 		sequenceOf(
-			RandomQuoteUiState.Loading,
+			// RandomQuoteUiState.Loading,
 			shortQuote,
-			quoteWithoutAuthor,
-			quoteWithoutBook,
-			quoteWithoutAttribution,
-			longQuote,
-			RandomQuoteUiState.Failure(R.string.e_default),
+			// quoteWithoutAuthor,
+			// quoteWithoutBook,
+			// quoteWithoutAttribution,
+			// longQuote,
+			// RandomQuoteUiState.Failure(R.string.e_default),
 		)
 }
 
