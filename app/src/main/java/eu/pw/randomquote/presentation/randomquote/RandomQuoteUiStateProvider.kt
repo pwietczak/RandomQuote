@@ -7,8 +7,7 @@ class RandomQuoteUiStateProvider : PreviewParameterProvider<RandomQuoteUiState> 
 	override val values: Sequence<RandomQuoteUiState> =
 		sequenceOf(
 			// RandomQuoteUiState.Loading,
-			shortQuote,
-			// quoteWithoutAuthor,
+			shortQuote, // quoteWithoutAuthor,
 			// quoteWithoutBook,
 			// quoteWithoutAttribution,
 			// longQuote,

@@ -10,17 +10,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.glance.appwidget.updateAll
 import dagger.hilt.android.AndroidEntryPoint
 import eu.pw.randomquote.presentation.randomquote.RandomQuoteScreen
 import eu.pw.randomquote.ui.theme.RandomQuoteTheme
-import eu.pw.randomquote.widget.presentation.QuoteWidget
+import eu.pw.widget.contract.QuoteWidgetUpdater
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 	@Inject
-	lateinit var quoteWidget: QuoteWidget
+	lateinit var quoteWidgetUpdater: QuoteWidgetUpdater
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		installSplashScreen()
@@ -28,7 +27,7 @@ class MainActivity : ComponentActivity() {
 		enableEdgeToEdge()
 		setContent {
 			LaunchedEffect(Unit) {
-				quoteWidget.updateAll(this@MainActivity)
+				quoteWidgetUpdater.updateWidgets()
 			}
 			RandomQuoteTheme {
 				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

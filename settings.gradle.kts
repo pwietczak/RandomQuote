@@ -11,6 +11,7 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+includeBuild("build-logic")
 plugins {
 	id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
@@ -24,4 +25,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "RandomQuote"
 include(":app")
- 
+include(":widget")
+include(":data")
+include(":domain")
+include(":domain:contract")
+include(":designsystem")
+include(":widget:contract")

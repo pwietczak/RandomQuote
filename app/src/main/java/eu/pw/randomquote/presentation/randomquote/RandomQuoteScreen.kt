@@ -63,11 +63,16 @@ private fun RandomQuoteScreenContent(
 			is RandomQuoteUiState.Loading -> {
 				LoadingContent(modifier = Modifier.padding(paddingValues))
 			}
+
 			is RandomQuoteUiState.Success -> {
 				SuccessContent(modifier = Modifier.padding(paddingValues), quote = uiState.quote)
 			}
+
 			is RandomQuoteUiState.Failure -> {
-				ErrorContent(modifier = Modifier.padding(paddingValues), messageResId = uiState.messageResId)
+				ErrorContent(
+					modifier = Modifier.padding(paddingValues),
+					messageResId = uiState.messageResId,
+				)
 			}
 		}
 	}

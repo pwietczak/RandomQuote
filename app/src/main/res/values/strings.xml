@@ -3,4 +3,6 @@
     <string name="rq_button_reload">Reload</string>
     <string name="rq_button_retry">Retry</string>
     <string name="e_default">Something went wrong. Try again.</string>
+    <string name="e_network">Check your internet connection and try again.</string>
+    <string name="e_invalid_response">The quote could not be loaded. Try again.</string>
 </resources>

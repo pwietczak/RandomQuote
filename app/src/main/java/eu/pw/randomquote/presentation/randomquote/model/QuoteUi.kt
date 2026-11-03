@@ -1,6 +1,6 @@
 package eu.pw.randomquote.presentation.randomquote.model
 
-import eu.pw.randomquote.domain.model.Quote
+import eu.pw.domain.contract.model.Quote
 
 class QuoteUi(
 	val text: String,
