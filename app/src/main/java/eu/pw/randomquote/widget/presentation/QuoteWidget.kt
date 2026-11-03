@@ -3,8 +3,9 @@ package eu.pw.randomquote.widget.presentation
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.Preferences
 import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -15,7 +16,6 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -26,55 +26,36 @@ import androidx.glance.preview.Preview
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import eu.pw.randomquote.MainActivity
-import eu.pw.randomquote.widget.data.QuoteWidgetState
+import eu.pw.randomquote.widget.data.QuoteDataStore
 import eu.pw.randomquote.widget.theme.RandomQuoteGlanceTheme
 import timber.log.Timber
+import javax.inject.Inject
 
-class QuoteWidget : GlanceAppWidget() {
-	override suspend fun provideGlance(
-		context: Context,
-		id: GlanceId,
-	) {
-		provideContent {
-			val stateUi = getWidgetState()
-			RandomQuoteGlanceTheme {
-				val stateUi = stateUi
-				QuoteWidgetContent(
-					stateUi = stateUi,
+class QuoteWidget
+	@Inject
+	constructor(
+		private val dataStore: QuoteDataStore,
+	) : GlanceAppWidget() {
+		override suspend fun provideGlance(
+			context: Context,
+			id: GlanceId,
+		) {
+			provideContent {
+				val state by dataStore.state.collectAsState()
+				Timber.d(
+					"Rendering QuoteWidget for $id: loading=${state.isLoading}, " +
+						"error=${state.isError}, quote=${state.quote}",
 				)
+				val stateUi = state.toUi()
+				Timber.d("##### stateUi: $stateUi")
+				RandomQuoteGlanceTheme {
+					QuoteWidgetContent(
+						stateUi = stateUi,
+					)
+				}
 			}
 		}
 	}
-}
-
-@Composable
-private fun getWidgetState(): QuoteWidgetUiState {
-	val preferences = currentState<Preferences>()
-	val quoteText = preferences[QuoteWidgetState.quoteTextKey]
-	val author = preferences[QuoteWidgetState.authorKey]
-	val book = preferences[QuoteWidgetState.bookKey]
-	val hasError = preferences[QuoteWidgetState.hasErrorKey] ?: false
-	val isLoading = preferences[QuoteWidgetState.isLoading] ?: false
-
-	if (isLoading) {
-		return QuoteWidgetUiState.Loading
-	}
-
-	if (hasError) {
-		return QuoteWidgetUiState.Error("Failed to load quote.")
-	}
-
-	if (quoteText == null) {
-		Timber.w("Quote text is null in widget state. Returning error state.")
-		return QuoteWidgetUiState.Error("Failed to load quote.")
-	}
-
-	return QuoteWidgetUiState.Success(
-		quote = quoteText,
-		author = author,
-		book = book,
-	)
-}
 
 @Composable
 private fun QuoteWidgetContent(stateUi: QuoteWidgetUiState) {

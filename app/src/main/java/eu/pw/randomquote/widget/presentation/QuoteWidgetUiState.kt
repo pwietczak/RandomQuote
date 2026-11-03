@@ -1,6 +1,8 @@
 package eu.pw.randomquote.widget.presentation
 
 import androidx.compose.runtime.Immutable
+import eu.pw.randomquote.widget.data.QuoteState
+import timber.log.Timber
 
 @Immutable
 sealed interface QuoteWidgetUiState {
@@ -15,4 +17,13 @@ sealed interface QuoteWidgetUiState {
 	data class Error(
 		val message: String,
 	) : QuoteWidgetUiState
+}
+
+fun QuoteState.toUi(): QuoteWidgetUiState {
+	Timber.d(
+		"Converting QuoteState to QuoteWidgetUiState: isLoading=$isLoading, quote=$quote, isError=$isError",
+	)
+	if (isLoading) return QuoteWidgetUiState.Loading
+	if (isError) return QuoteWidgetUiState.Error("Failed to load quote.")
+	return QuoteWidgetUiState.Success(quote ?: "", null, null)
 }

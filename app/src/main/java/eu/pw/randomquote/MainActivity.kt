@@ -15,18 +15,20 @@ import dagger.hilt.android.AndroidEntryPoint
 import eu.pw.randomquote.presentation.randomquote.RandomQuoteScreen
 import eu.pw.randomquote.ui.theme.RandomQuoteTheme
 import eu.pw.randomquote.widget.presentation.QuoteWidget
-import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+	@Inject
+	lateinit var quoteWidget: QuoteWidget
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		installSplashScreen()
-		Timber.plant(Timber.DebugTree())
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
 		setContent {
 			LaunchedEffect(Unit) {
-				QuoteWidget().updateAll(this@MainActivity)
+				quoteWidget.updateAll(this@MainActivity)
 			}
 			RandomQuoteTheme {
 				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

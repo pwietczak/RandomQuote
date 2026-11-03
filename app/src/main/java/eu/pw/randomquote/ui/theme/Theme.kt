@@ -111,9 +111,7 @@ fun RandomQuoteTheme(
 	// Dynamic color is available on Android 12+. Set to true if you want to enable this
 	darkTheme: Boolean = isSystemInDarkTheme(),
 	dynamicColor: Boolean = false,
-	content:
-		@Composable()
-		() -> Unit,
+	content: @Composable () -> Unit,
 ) {
 	val colorScheme =
 		when {

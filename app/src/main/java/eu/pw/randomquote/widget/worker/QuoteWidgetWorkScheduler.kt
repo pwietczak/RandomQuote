@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 object QuoteWidgetWorkScheduler {
@@ -23,13 +24,14 @@ object QuoteWidgetWorkScheduler {
 				.setBackoffCriteria(
 					backoffPolicy = BackoffPolicy.EXPONENTIAL,
 					backoffDelay = WorkRequest.MIN_BACKOFF_MILLIS,
-					timeUnit = TimeUnit.MICROSECONDS,
+					timeUnit = TimeUnit.MILLISECONDS,
 				).build()
 
 		WorkManager.getInstance(context).enqueueUniqueWork(
 			uniqueWorkName = REFRESH_WORK_NAME,
-			existingWorkPolicy = ExistingWorkPolicy.KEEP,
+			existingWorkPolicy = ExistingWorkPolicy.REPLACE,
 			request = request,
 		)
+		Timber.d("Enqueued QuoteWidgetWorker with ID ${request.id}")
 	}
 }
