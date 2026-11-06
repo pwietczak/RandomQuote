@@ -2,7 +2,6 @@ package eu.pw.widget.presentation
 
 import androidx.compose.runtime.Immutable
 import eu.pw.widget.data.QuoteState
-import timber.log.Timber
 
 @Immutable
 sealed interface QuoteWidgetUiState {
@@ -20,10 +19,7 @@ sealed interface QuoteWidgetUiState {
 }
 
 fun QuoteState.toUi(): QuoteWidgetUiState {
-	Timber.d(
-		"Converting QuoteState to QuoteWidgetUiState: isLoading=$isLoading, quote=$quote, isError=$isError",
-	)
 	if (isLoading) return QuoteWidgetUiState.Loading
 	if (isError) return QuoteWidgetUiState.Error("Failed to load quote.")
-	return QuoteWidgetUiState.Success(quote ?: "", null, null)
+	return QuoteWidgetUiState.Success(quote?.text ?: "", quote?.author, quote?.book)
 }

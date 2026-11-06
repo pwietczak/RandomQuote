@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import eu.pw.domain.contract.model.Quote
+import eu.pw.widget.data.converter.QuoteConverter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,10 +22,10 @@ class QuoteDataStore
 	@Inject
 	constructor(
 		private val dataStore: DataStore<Preferences>,
+		private val quoteConverter: QuoteConverter,
 	) {
 		private companion object {
 			const val PREFIX = "quote_widget_"
-
 			const val LOADING_KEY = "${PREFIX}loading"
 			const val ERROR_KEY = "${PREFIX}error"
 			const val QUOTE_KEY = "${PREFIX}quote"
@@ -58,7 +60,7 @@ class QuoteDataStore
 		private fun Preferences.getState(): QuoteState {
 			val isLoading = readLoading()
 			val isError = readError()
-			val quote = readQuote()
+			val quote = quoteConverter.toQuote(readQuote())
 
 			return QuoteState(
 				isLoading = isLoading,
@@ -87,11 +89,11 @@ class QuoteDataStore
 				}
 			}
 
-		suspend fun setQuote(quote: String) =
+		suspend fun setQuote(quote: Quote) =
 			withContext(Dispatchers.IO) {
 				dataStore.updateData { preferences ->
 					preferences.toMutablePreferences().apply {
-						this[quoteKey] = quote
+						this[quoteKey] = quoteConverter.toJson(quote)
 						this[loadingKey] = false
 						this[errorKey] = false
 					}

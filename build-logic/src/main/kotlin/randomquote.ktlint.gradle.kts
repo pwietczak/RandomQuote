@@ -14,5 +14,5 @@ ktlint {
 }
 
 tasks.matching { it.name == "preBuild" }.configureEach {
-	dependsOn("ktlintCheck")
+	dependsOn("ktlintFormat")
 }

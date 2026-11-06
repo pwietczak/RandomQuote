@@ -21,41 +21,48 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.layout.wrapContentSize
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import eu.pw.widget.contract.WidgetNavigationContract
 import eu.pw.widget.data.QuoteDataStore
 import eu.pw.widget.theme.RandomQuoteGlanceTheme
-import timber.log.Timber
-import javax.inject.Inject
 
-class QuoteWidget
-	@Inject
-	constructor(
-		private val dataStore: QuoteDataStore,
-	) : GlanceAppWidget() {
-		override suspend fun provideGlance(
-			context: Context,
-			id: GlanceId,
-		) {
-			provideContent {
-				val state by dataStore.state.collectAsState()
-				Timber.d(
-					"Rendering QuoteWidget for $id: loading=${state.isLoading}, " +
-						"error=${state.isError}, quote=${state.quote}",
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface WidgetEntryPoint {
+	fun quoteDataStore(): QuoteDataStore
+}
+
+class QuoteWidget : GlanceAppWidget() {
+	override suspend fun provideGlance(
+		context: Context,
+		id: GlanceId,
+	) {
+		val dataStore =
+			EntryPointAccessors
+				.fromApplication(
+					context.applicationContext,
+					WidgetEntryPoint::class.java,
+				).quoteDataStore()
+
+		provideContent {
+			val state by dataStore.state.collectAsState()
+			val stateUi = state.toUi()
+			RandomQuoteGlanceTheme {
+				QuoteWidgetContent(
+					stateUi = stateUi,
 				)
-				val stateUi = state.toUi()
-				Timber.d("##### stateUi: $stateUi")
-				RandomQuoteGlanceTheme {
-					QuoteWidgetContent(
-						stateUi = stateUi,
-					)
-				}
 			}
 		}
 	}
+}
 
 @Composable
 private fun QuoteWidgetContent(stateUi: QuoteWidgetUiState) {
@@ -69,7 +76,7 @@ private fun QuoteWidgetContent(stateUi: QuoteWidgetUiState) {
 	Box(
 		modifier =
 			GlanceModifier
-				.fillMaxSize()
+				.wrapContentSize()
 				.background(RandomQuoteGlanceTheme.colors.background)
 				.clickable(actionStartActivity(intent))
 				.padding(16.dp),

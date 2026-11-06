@@ -22,6 +22,10 @@ dependencies {
 	implementation(libs.androidx.datastore.preferences)
 	implementation(libs.timber)
 
+	implementation(libs.moshi.kotlin)
+	implementation(libs.moshi.adapters)
+	ksp(libs.moshi.codegen)
+
 	implementation(libs.hilt)
 	implementation(libs.hilt.work)
 	ksp(libs.hilt.compiler)

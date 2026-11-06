@@ -29,7 +29,7 @@ class QuoteWidgetUpdateUseCase
 		}
 
 		private suspend fun onSuccess(quote: Quote): UpdateResult {
-			dataStore.setQuote(quote.text)
+			dataStore.setQuote(quote)
 			widgetUpdater.updateWidgets()
 			return UpdateResult.Success
 		}
