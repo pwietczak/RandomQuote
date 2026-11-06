@@ -28,6 +28,7 @@
                 <action android:name="eu.pw.randomquote.widget.OPEN_APP" />
 
                 <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="glance-action" />
             </intent-filter>
         </activity>
 

@@ -1,5 +1,6 @@
 package eu.pw.widget.theme
 
+import android.content.Context
 import androidx.compose.runtime.compositionLocalOf
 import androidx.glance.material3.ColorProviders
 import eu.pw.designsystem.theme.darkScheme
@@ -11,9 +12,9 @@ internal val LocalRandomQuoteGlanceColorScheme =
 	}
 
 internal object RandomQuoteGlanceColorScheme {
-	val colors =
+	fun colors(context: Context) =
 		ColorProviders(
-			light = lightScheme,
-			dark = darkScheme,
+			light = lightScheme(context),
+			dark = darkScheme(context),
 		)
 }

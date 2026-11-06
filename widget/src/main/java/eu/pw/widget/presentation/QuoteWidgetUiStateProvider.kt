@@ -2,7 +2,7 @@ package eu.pw.widget.presentation
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 
-class QuoteWidgetUiStateProvider : PreviewParameterProvider<QuoteWidgetUiState> {
+internal class QuoteWidgetUiStateProvider : PreviewParameterProvider<QuoteWidgetUiState> {
 	override val values: Sequence<QuoteWidgetUiState> =
 		sequenceOf(
 			QuoteWidgetUiState.Loading,

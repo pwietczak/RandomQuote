@@ -3,23 +3,23 @@ package eu.pw.widget.usecase
 import eu.pw.domain.contract.model.Quote
 import eu.pw.domain.contract.usecase.GetRandomQuoteUseCase
 import eu.pw.widget.contract.QuoteWidgetUpdater
-import eu.pw.widget.data.QuoteDataStore
+import eu.pw.widget.data.repository.WidgetStateRepository
 import javax.inject.Inject
 
-class QuoteWidgetUpdateUseCase
+internal class QuoteWidgetUpdateUseCase
 	@Inject
 	constructor(
 		private val getRandomQuote: GetRandomQuoteUseCase,
-		private val dataStore: QuoteDataStore,
+		private val dataStore: WidgetStateRepository,
 		private val widgetUpdater: QuoteWidgetUpdater,
 	) {
-		sealed interface UpdateResult {
+		internal sealed interface UpdateResult {
 			object Success : UpdateResult
 
 			object Failure : UpdateResult
 		}
 
-		suspend operator fun invoke(): UpdateResult {
+		internal suspend operator fun invoke(): UpdateResult {
 			startLoadingWidget()
 
 			return when (val result = getRandomQuote()) {

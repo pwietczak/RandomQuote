@@ -1,10 +1,10 @@
 package eu.pw.widget.presentation
 
 import androidx.compose.runtime.Immutable
-import eu.pw.widget.data.QuoteState
+import eu.pw.widget.data.model.WidgetState
 
 @Immutable
-sealed interface QuoteWidgetUiState {
+internal sealed interface QuoteWidgetUiState {
 	data object Loading : QuoteWidgetUiState
 
 	data class Success(
@@ -18,7 +18,7 @@ sealed interface QuoteWidgetUiState {
 	) : QuoteWidgetUiState
 }
 
-fun QuoteState.toUi(): QuoteWidgetUiState {
+internal fun WidgetState.toUi(): QuoteWidgetUiState {
 	if (isLoading) return QuoteWidgetUiState.Loading
 	if (isError) return QuoteWidgetUiState.Error("Failed to load quote.")
 	return QuoteWidgetUiState.Success(quote?.text ?: "", quote?.author, quote?.book)

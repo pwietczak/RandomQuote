@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+        android:description="@string/quote_widget_description"
+        android:initialLayout="@layout/glance_default_loading_layout"
         android:minWidth="@dimen/qw_min_width"
         android:minHeight="@dimen/qw_min_height"
+        android:previewImage="@drawable/widget_preview"
+
+        android:previewLayout="@layout/widget_preview"
         android:resizeMode="horizontal|vertical"
         android:targetCellWidth="@integer/qw_target_cell_width"
-        android:targetCellHeight="@integer/qw_target_cell_height" />
+        android:targetCellHeight="@integer/qw_target_cell_height"
+        android:updatePeriodMillis="0"
+        android:widgetCategory="home_screen" />

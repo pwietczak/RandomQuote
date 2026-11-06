@@ -1,4 +1,4 @@
-package eu.pw.widget.data
+package eu.pw.widget.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,24 +6,21 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import eu.pw.domain.contract.model.Quote
 import eu.pw.widget.data.converter.QuoteConverter
-import kotlinx.coroutines.CoroutineScope
+import eu.pw.widget.data.model.WidgetState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class QuoteDataStore
+internal class WidgetStateRepositoryImpl
 	@Inject
 	constructor(
 		private val dataStore: DataStore<Preferences>,
 		private val quoteConverter: QuoteConverter,
-	) {
+	) : WidgetStateRepository {
 		private companion object {
 			const val PREFIX = "quote_widget_"
 			const val LOADING_KEY = "${PREFIX}loading"
@@ -31,25 +28,15 @@ class QuoteDataStore
 			const val QUOTE_KEY = "${PREFIX}quote"
 		}
 
-		private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 		private val loadingKey = booleanPreferencesKey(LOADING_KEY)
 		private val errorKey = booleanPreferencesKey(ERROR_KEY)
 		private val quoteKey = stringPreferencesKey(QUOTE_KEY)
 
-		val state =
+		override val state: Flow<WidgetState> =
 			dataStore.data
 				.map { preferences ->
-					preferences.getState().also { state ->
-						Timber.d(
-							"Quote widget state read: loading=${state.isLoading}, " +
-								"error=${state.isError}, hasQuote=${state.quote != null}",
-						)
-					}
-				}.stateIn(
-					scope,
-					started = SharingStarted.Lazily,
-					initialValue = QuoteState(),
-				)
+					preferences.getState()
+				}
 
 		private fun Preferences.readLoading(): Boolean = this[loadingKey] ?: false
 
@@ -57,19 +44,19 @@ class QuoteDataStore
 
 		private fun Preferences.readQuote(): String? = this[quoteKey]
 
-		private fun Preferences.getState(): QuoteState {
+		private fun Preferences.getState(): WidgetState {
 			val isLoading = readLoading()
 			val isError = readError()
 			val quote = quoteConverter.toQuote(readQuote())
 
-			return QuoteState(
+			return WidgetState(
 				isLoading = isLoading,
 				quote = quote,
 				isError = isError,
 			)
 		}
 
-		suspend fun setLoading() =
+		override suspend fun setLoading(): Unit =
 			withContext(Dispatchers.IO) {
 				dataStore.updateData { preferences ->
 					preferences.toMutablePreferences().apply {
@@ -79,7 +66,7 @@ class QuoteDataStore
 				}
 			}
 
-		suspend fun setError() =
+		override suspend fun setError(): Unit =
 			withContext(Dispatchers.IO) {
 				dataStore.updateData { preferences ->
 					preferences.toMutablePreferences().apply {
@@ -89,7 +76,7 @@ class QuoteDataStore
 				}
 			}
 
-		suspend fun setQuote(quote: Quote) =
+		override suspend fun setQuote(quote: Quote): Unit =
 			withContext(Dispatchers.IO) {
 				dataStore.updateData { preferences ->
 					preferences.toMutablePreferences().apply {

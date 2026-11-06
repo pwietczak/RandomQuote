@@ -6,7 +6,7 @@ import eu.pw.widget.contract.QuoteWidgetUpdater
 import eu.pw.widget.presentation.QuoteWidget
 import javax.inject.Inject
 
-class QuoteWidgetUpdaterImpl
+internal class QuoteWidgetUpdaterImpl
 	@Inject
 	constructor(
 		private val context: Context,

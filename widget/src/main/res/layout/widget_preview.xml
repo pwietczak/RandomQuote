@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/qw_min_width"
+    android:layout_height="@dimen/qw_min_height"
+    android:background="@drawable/widget_background"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/wp_quote"
+            android:textColor="@color/widget_on_background"
+            android:textSize="@dimen/qw_quote_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/wp_author"
+            android:textColor="@color/widget_on_background"
+            android:textSize="@dimen/qw_author_text_size" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/wp_book"
+            android:textColor="@color/widget_on_background"
+            android:textSize="@dimen/qw_book_text_size"
+            android:textStyle="italic" />
+    </LinearLayout>
+</LinearLayout>

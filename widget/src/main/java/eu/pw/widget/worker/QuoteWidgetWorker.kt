@@ -1,41 +1,41 @@
 package eu.pw.widget.worker
 
 import android.content.Context
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import eu.pw.widget.presentation.QuoteWidget
-import eu.pw.widget.usecase.QuoteWidgetUpdateUseCase
 import timber.log.Timber
 
 @HiltWorker
 class QuoteWidgetWorker
 	@AssistedInject
-	constructor(
+	internal constructor(
 		@Assisted appContext: Context,
 		@Assisted params: WorkerParameters,
-		private val useCase: QuoteWidgetUpdateUseCase,
+		private val runner: QuoteWidgetWorkRunner,
 	) : CoroutineWorker(appContext, params) {
-		override suspend fun doWork(): Result {
-			Timber.d("QuoteWidgetWorker started with ID $id")
-			val glanceIds =
-				GlanceAppWidgetManager(applicationContext).getGlanceIds(QuoteWidget::class.java)
-			if (glanceIds.isEmpty()) {
-				Timber.d("No QuoteWidget glance IDs found, returning Success")
-				return Result.success()
-			}
+		private companion object {
+			private const val TAG = "QuoteWidgetWorker"
+		}
 
-			when (val result = useCase()) {
-				QuoteWidgetUpdateUseCase.UpdateResult.Failure -> {
-					Timber.d("QuoteWidgetWorker failed to update widget state, returning Failure")
-					return Result.failure()
+		override suspend fun doWork(): Result {
+			Timber.tag(TAG).d("QuoteWidgetWorker started with ID '$id'")
+			return when (runner.run()) {
+				QuoteWidgetWorkRunner.Outcome.SKIPPED -> {
+					Timber.tag(TAG).d("QuoteWidgetWorker skipped work because no active widgets were found")
+					Result.success()
 				}
-				QuoteWidgetUpdateUseCase.UpdateResult.Success -> {
-					Timber.d("QuoteWidgetWorker successfully updated widget state, returning Success")
-					return Result.success()
+
+				QuoteWidgetWorkRunner.Outcome.FAILURE -> {
+					Timber.tag(TAG).d("QuoteWidgetWorker failed to update widget state, returning Failure")
+					Result.failure()
+				}
+
+				QuoteWidgetWorkRunner.Outcome.SUCCESS -> {
+					Timber.tag(TAG).d("QuoteWidgetWorker successfully updated widget state, returning Success")
+					Result.success()
 				}
 			}
 		}

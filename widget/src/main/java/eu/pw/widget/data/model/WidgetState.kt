@@ -1,8 +1,8 @@
-package eu.pw.widget.data
+package eu.pw.widget.data.model
 
 import eu.pw.domain.contract.model.Quote
 
-data class QuoteState(
+internal data class WidgetState(
 	val isLoading: Boolean = false,
 	val quote: Quote? = null,
 	val isError: Boolean = false,

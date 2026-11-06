@@ -11,13 +11,13 @@ import androidx.work.WorkRequest
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-object QuoteWidgetWorkScheduler {
+internal object QuoteWidgetWorkScheduler {
 	private const val REFRESH_WORK_NAME = "quote_widget_refresh"
 
 	private fun networkConstrains() =
 		Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-	fun enqueueRefresh(context: Context) {
+	internal fun enqueueRefresh(context: Context) {
 		val request =
 			OneTimeWorkRequestBuilder<QuoteWidgetWorker>()
 				.setConstraints(networkConstrains())

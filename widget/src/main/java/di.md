@@ -12,7 +12,7 @@ Because `QuoteWidgetReceiver` was instantiated directly via reflection rather th
 
 2. **`[QuoteWidget.kt](file:///C:/repo/RandomQuote/widget/src/main/java/eu/pw/widget/presentation/QuoteWidget.kt)`**:
     - Changed `QuoteWidget` to have a no-argument constructor so it can be instantiated safely without dependencies at receiver creation time.
-    - Added a Hilt `@EntryPoint` interface (`WidgetEntryPoint`) to lazily retrieve `QuoteDataStore` using `EntryPointAccessors.fromApplication` inside `provideGlance(context, id)`.
+    - Added a Hilt `@EntryPoint` interface (`WidgetEntryPoint`) to lazily retrieve `WidgetStateRepositoryImpl` using `EntryPointAccessors.fromApplication` inside `provideGlance(context, id)`.
 
 3. **`[QuoteWidgetUpdaterImpl.kt](file:///C:/repo/RandomQuote/widget/src/main/java/eu/pw/widget/QuoteWidgetUpdaterImpl.kt)`**:
     - Removed `private val widget: QuoteWidget` constructor parameter and invoked `QuoteWidget().updateAll(context)` directly.

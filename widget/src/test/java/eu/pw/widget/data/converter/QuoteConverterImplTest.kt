@@ -1,8 +1,10 @@
 package eu.pw.widget.data.converter
 
+import com.squareup.moshi.JsonDataException
 import eu.pw.domain.contract.model.Quote
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class QuoteConverterImplTest {
@@ -110,5 +112,20 @@ class QuoteConverterImplTest {
 		val convertedQuote = converter.toQuote(json)
 
 		assertEquals(originalQuote, convertedQuote)
+	}
+
+	@Test
+	fun `toJson and toQuote roundtrip preserves escaped characters`() {
+		val originalQuote =
+			Quote(text = "Quotes: \"hello\"\\world\nnext line", author = null, book = null)
+
+		assertEquals(originalQuote, converter.toQuote(converter.toJson(originalQuote)))
+	}
+
+	@Test
+	fun `toQuote throws when required text field is missing`() {
+		assertThrows(JsonDataException::class.java) {
+			converter.toQuote("""{"author":"A. Example"}""")
+		}
 	}
 }

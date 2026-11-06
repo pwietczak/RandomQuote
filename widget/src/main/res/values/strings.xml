@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="quote_widget_description">See random quote</string>
+    <string name="wp_quote">The only way to do great work is to love what you do.</string>
+    <string name="wp_author">Steve Jobs</string>
+    <string name="wp_book">Stay Hungry, Stay Foolish</string>
+    <string name="qw_refresh_button_desc">Refresh quote</string>
+    <string name="qw_button_retry">Retry</string>
+</resources>

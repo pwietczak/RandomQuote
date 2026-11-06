@@ -7,7 +7,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import eu.pw.domain.contract.model.Quote
 import javax.inject.Inject
 
-class QuoteConverterImpl
+internal class QuoteConverterImpl
 	@Inject
 	constructor() : QuoteConverter {
 		private val moshi: Moshi =

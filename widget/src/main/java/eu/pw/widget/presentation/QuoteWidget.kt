@@ -6,41 +6,45 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
-import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.appWidgetBackground
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
-import androidx.glance.layout.Column
-import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.layout.wrapContentSize
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
-import androidx.glance.text.Text
-import androidx.glance.text.TextAlign
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import eu.pw.widget.R
 import eu.pw.widget.contract.WidgetNavigationContract
-import eu.pw.widget.data.QuoteDataStore
+import eu.pw.widget.data.model.WidgetState
+import eu.pw.widget.data.repository.WidgetStateRepositoryImpl
+import eu.pw.widget.presentation.component.QuoteWidgetError
+import eu.pw.widget.presentation.component.QuoteWidgetLoading
+import eu.pw.widget.presentation.component.QuoteWidgetSuccess
+import eu.pw.widget.presentation.util.stringResource
 import eu.pw.widget.theme.RandomQuoteGlanceTheme
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface WidgetEntryPoint {
-	fun quoteDataStore(): QuoteDataStore
+internal interface WidgetEntryPoint {
+	fun quoteDataStore(): WidgetStateRepositoryImpl
 }
 
-class QuoteWidget : GlanceAppWidget() {
+internal class QuoteWidget : GlanceAppWidget() {
 	override suspend fun provideGlance(
 		context: Context,
 		id: GlanceId,
@@ -53,8 +57,9 @@ class QuoteWidget : GlanceAppWidget() {
 				).quoteDataStore()
 
 		provideContent {
-			val state by dataStore.state.collectAsState()
+			val state by dataStore.state.collectAsState(initial = WidgetState())
 			val stateUi = state.toUi()
+
 			RandomQuoteGlanceTheme {
 				QuoteWidgetContent(
 					stateUi = stateUi,
@@ -62,10 +67,26 @@ class QuoteWidget : GlanceAppWidget() {
 			}
 		}
 	}
+
+	override suspend fun providePreview(
+		context: Context,
+		widgetCategory: Int,
+	) {
+		provideContent {
+			RandomQuoteGlanceTheme {
+				QuoteWidgetContent(
+					stateUi = getPreviewState(),
+				)
+			}
+		}
+	}
 }
 
 @Composable
-private fun QuoteWidgetContent(stateUi: QuoteWidgetUiState) {
+private fun QuoteWidgetContent(
+	stateUi: QuoteWidgetUiState,
+	modifier: GlanceModifier = GlanceModifier.wrapContentSize(),
+) {
 	val context = LocalContext.current
 	val intent =
 		Intent(WidgetNavigationContract.ACTION_OPEN_APP).apply {
@@ -75,11 +96,12 @@ private fun QuoteWidgetContent(stateUi: QuoteWidgetUiState) {
 
 	Box(
 		modifier =
-			GlanceModifier
-				.wrapContentSize()
-				.background(RandomQuoteGlanceTheme.colors.background)
+			modifier
+				.appWidgetBackground()
+				// .cornerRadius(16.dp) works in api 31+
+				.background(ImageProvider(R.drawable.widget_background))
 				.clickable(actionStartActivity(intent))
-				.padding(16.dp),
+				.padding(RandomQuoteGlanceTheme.spacing.widgetPadding),
 		contentAlignment = Alignment.Center,
 	) {
 		when (stateUi) {
@@ -91,109 +113,41 @@ private fun QuoteWidgetContent(stateUi: QuoteWidgetUiState) {
 }
 
 @Composable
-private fun QuoteWidgetLoading() {
-	Text(
-		text = "Loading...",
-		style = RandomQuoteGlanceTheme.typography.quote,
+private fun getPreviewState(): QuoteWidgetUiState.Success =
+	QuoteWidgetUiState.Success(
+		quote = stringResource(R.string.wp_quote),
+		author = stringResource(R.string.wp_author),
+		book = stringResource(R.string.wp_book),
 	)
-}
 
+@OptIn(ExperimentalGlancePreviewApi::class)
+@Preview
 @Composable
-private fun QuoteWidgetError(errorState: QuoteWidgetUiState.Error) {
-	Column(
-		modifier = GlanceModifier.fillMaxSize(),
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalAlignment = Alignment.CenterVertically,
-	) {
-		Column(
-			modifier = GlanceModifier.defaultWeight(),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Text(
-				text = errorState.message,
-				style = RandomQuoteGlanceTheme.typography.quote,
-			)
-		}
-		Button(
-			text = "Refresh",
-			onClick = actionRunCallback<QuoteWidgetRefreshAction>(),
-		)
-	}
-}
-
-@Composable
-private fun QuoteWidgetSuccess(successState: QuoteWidgetUiState.Success) {
-	Column(
-		modifier = GlanceModifier.fillMaxSize(),
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalAlignment = Alignment.CenterVertically,
-	) {
-		Column(
-			modifier = GlanceModifier.defaultWeight(),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Text(
-				text = successState.quote,
-				style = RandomQuoteGlanceTheme.typography.quote.copy(textAlign = TextAlign.Center),
-			)
-			successState.author?.let { author ->
-				Text(
-					text = author,
-					style = RandomQuoteGlanceTheme.typography.author,
-				)
-			}
-			successState.book?.let { book ->
-				Text(
-					text = book,
-					style = RandomQuoteGlanceTheme.typography.book,
-				)
-			}
-		}
-		Button(
-			text = "Refresh",
-			onClick = actionRunCallback<QuoteWidgetRefreshAction>(),
+private fun QuoteWidgetPreview() {
+	val stateUi = getPreviewState()
+	RandomQuoteGlanceTheme {
+		QuoteWidgetContent(
+			stateUi = stateUi,
+			modifier =
+				GlanceModifier
+					.size(width = 260.dp, height = 140.dp)
+					.cornerRadius(16.dp),
 		)
 	}
 }
 
 @OptIn(ExperimentalGlancePreviewApi::class)
+@Preview
 @Composable
-@Preview(widthDp = 200, heightDp = 200)
-private fun QuoteWidgetLoadingPreview() {
-	RandomQuoteGlanceTheme {
+private fun QuoteWidgetDarkPreview() {
+	val stateUi = getPreviewState()
+	RandomQuoteGlanceTheme(dark = true) {
 		QuoteWidgetContent(
-			stateUi = QuoteWidgetUiState.Loading,
-		)
-	}
-}
-
-@OptIn(ExperimentalGlancePreviewApi::class)
-@Composable
-@Preview(widthDp = 200, heightDp = 200)
-private fun QuoteWidgetSuccessPreview() {
-	RandomQuoteGlanceTheme {
-		QuoteWidgetContent(
-			stateUi =
-				QuoteWidgetUiState.Success(
-					quote =
-						"The more carefully we pay attention to the small details of " +
-							"everyday life, the more we appreciate its beauty.",
-					author = "A. Example",
-					book = "Small Ideas",
-				),
-		)
-	}
-}
-
-@OptIn(ExperimentalGlancePreviewApi::class)
-@Composable
-@Preview(widthDp = 200, heightDp = 200)
-private fun QuoteWidgetErrorPreview() {
-	RandomQuoteGlanceTheme {
-		QuoteWidgetContent(
-			stateUi = QuoteWidgetUiState.Error("Failed to load quote."),
+			stateUi = stateUi,
+			modifier =
+				GlanceModifier
+					.size(width = 260.dp, height = 140.dp)
+					.cornerRadius(16.dp),
 		)
 	}
 }

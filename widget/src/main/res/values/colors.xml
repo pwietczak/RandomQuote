@@ -1,0 +1,6 @@
+<resources>
+    <color name="widget_background">@color/design_background_light</color>
+    <color name="widget_on_background">@color/design_on_background_light</color>
+    <color name="widget_primary">@color/design_primary_light</color>
+    <color name="widget_on_primary">@color/design_on_primary_light</color>
+</resources>
